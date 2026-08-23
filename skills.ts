@@ -22,7 +22,13 @@ import path from "node:path";
 /** Edit these to wherever YOUR cli keeps skills. */
 export function skillDirectories(cwd: string) {
 	return [
-		{ p: path.join(cwd, ".myskills"), source: "project" as const }, // your project folder
+		{ p: path.join(cwd, ".myskills"), source: "project" as const }, // your own folder
+		// Standard locations — `npx skills add <repo> --agent <x>` installs into
+		// one of these, so skills installed via npx are read automatically:
+		{ p: path.join(cwd, ".agents/skills"), source: "project" as const },
+		{ p: path.join(cwd, ".claude/skills"), source: "project" as const },
+		{ p: path.join(cwd, ".cline/skills"), source: "project" as const },
+		{ p: path.join(os.homedir(), ".agents", "skills"), source: "global" as const },
 		{ p: path.join(os.homedir(), ".mycli", "skills"), source: "global" as const }, // user-global
 	];
 }
