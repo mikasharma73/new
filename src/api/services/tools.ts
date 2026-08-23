@@ -1,4 +1,11 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { getAvailableSkills } from "./agent-skills.ts";
+
+const SKILLS_TOOL_BASE_DESCRIPTION =
+  "Execute a skill within the main conversation. " +
+  "When users ask you to perform tasks, check if any available skills match. " +
+  'Input: `skill` (required) and optional `args`. ' +
+  "When a skill matches the user's request, invoking this tool is required before any other response.";
 
 export const tools: Anthropic.Tool[] = [
   {
@@ -60,4 +67,29 @@ export const tools: Anthropic.Tool[] = [
       required: ["path", "content"],
     },
   },
+  {
+    name: "skills",
+    // ⭐ LIVE GETTER (Cline-style): re-evaluated every time the request body is
+    // serialized, so newly watched skills appear without any restart.
+    get description(): string {
+      const names = getAvailableSkills().filter((s) => !s.disabled).map((s) => s.name);
+      return names.length
+        ? `${SKILLS_TOOL_BASE_DESCRIPTION} Available skills: ${names.join(", ")}.`
+        : `${SKILLS_TOOL_BASE_DESCRIPTION}`;
+    },
+    input_schema: {
+      type: "object",
+      properties: {
+        skill: {
+          type: "string",
+          description: "Name of the skill to load (must match an available skill name).",
+        },
+        args: {
+          type: "string",
+          description: "Optional arguments passed through to the skill.",
+        },
+      },
+      required: ["skill"],
+    },
+  } as Anthropic.Tool,
 ];

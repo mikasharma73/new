@@ -83,6 +83,8 @@ export async function writeFileSkill(filePath: string, content: string): Promise
   }
 }
 
+import { executeLoadedSkill } from "./agent-skills.ts";
+
 /**
  * Main dispatcher to execute registered skills based on tool call name.
  */
@@ -91,6 +93,12 @@ export async function executeSkill(
   input: Record<string, any>
 ): Promise<string> {
   switch (name) {
+    case "skills":
+    case "use_skill":
+      // Load a SKILL.md skill's full instructions from disk
+      return await executeLoadedSkill(input.skill || input.name || "", input.args);
+    case "execute_command":
+
     case "execute_command":
     case "cmd":
     case "run_command":
