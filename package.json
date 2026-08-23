@@ -1,0 +1,29 @@
+{
+  "name": "cmdc",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "bin": {
+    "cmdc": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "bun build ./src/cli.tsx ./index.ts --outdir=./dist --entry-naming=[name].[ext] --target=node --packages=external",
+    "start": "bun src/cli.tsx",
+    "dev": "bun src/cli.tsx"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
+    "commander": "^13.1.0",
+    "ink": "^6.8.0",
+    "ink-text-input": "^6.0.0",
+    "picocolors": "^1.1.1",
+    "react": "^19.2.4",
+    "streamdown": "^1.0.0",
+    "use-interval": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.2.14"
+  }
+}
