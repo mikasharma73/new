@@ -22,8 +22,28 @@ function skillDirectories(cwd = process.cwd()) {
 		{ p: join(cwd, ".cline", "skills"), source: "project" as const },
 		{ p: join(cwd, ".claude", "skills"), source: "project" as const },
 		{ p: join(cwd, ".agents", "skills"), source: "project" as const }, // canonical npx location
+		// Global locations — skills installed here work in ANY project,
+		// exactly like Cline's ~/.cline/skills (this is how Cline always
+		// sees its skills no matter which folder you open it in):
 		{ p: join(os.homedir(), ".cmdc", "skills"), source: "global" as const },
+		{ p: join(os.homedir(), ".claude", "skills"), source: "global" as const },
+		{ p: join(os.homedir(), ".agents", "skills"), source: "global" as const },
 	];
+}
+
+/**
+ * Prime the watcher + wait for the FIRST scan to finish.
+ * Call once at startup so the very first request already has a populated
+ * list (getAvailableSkills() is sync and would otherwise return [] on the
+ * first call before the async rescan completes).
+ */
+let readyPromise: Promise<void> | null = null;
+export function ensureSkillsReady(): Promise<void> {
+	if (!readyPromise) {
+		const watcher = watchAgentSkills();
+		readyPromise = Promise.resolve(watcher.rescan()).then(() => undefined);
+	}
+	return readyPromise;
 }
 
 /** Tiny YAML frontmatter parser (same subset as Cline's parseYamlFrontmatter). */

@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { SysPrompt } from "./prompt.ts";
 import { tools } from "./services/tools.ts";
 import { executeSkill } from "./services/skills.ts";
+import { ensureSkillsReady } from "./services/agent-skills.ts";
 import type { OutputMessage } from "../types.ts";
 
 const apiKey = process.env.DEEPSEEK_API_KEY || process.env.ANTHROPIC_API_KEY || "";
@@ -21,6 +22,9 @@ export async function askAI(
     const model = process.env.MODEL_NAME || "stealth/ox-alpha";
     const max_tokens = Number(process.env.MAX_TOKENS) || 4096;
     const system = String(SysPrompt()) || "You are a helpful coding assistant.";
+
+    // Make sure the first request already has a fully scanned skill list:
+    await ensureSkillsReady();
 
     const messages: Anthropic.MessageParam[] = [
         { role: "user", content: prompt }
